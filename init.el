@@ -45,13 +45,10 @@
 (progn ;; confs
   (progn ;; smartparens
     (require 'smartparens-config)
-    (with-eval-after-load 'smartparens
-      ;; if you use Ctrl+(Left|Right), disable the next line
-      (sp-use-paredit-bindings) ;; paredit keybindings
-      (smartparens-global-mode +1)
-      (smartparens-strict-mode +1)
-      (show-smartparens-global-mode +1)))
-
+    (sp-use-paredit-bindings) ;; paredit keybindings
+    (smartparens-global-mode +1)
+    (smartparens-strict-mode +1)
+    (show-smartparens-global-mode +1))
   (progn ;; company
     (require 'company)
     (global-company-mode +1)
@@ -62,16 +59,27 @@
     (define-key company-active-map (kbd "\C-p") 'company-select-previous)
     (define-key company-active-map (kbd "\C-d") 'company-show-doc-buffer)
     (define-key company-active-map (kbd "M-.") 'company-show-location))
+  (progn ;; whitespace
+    (require 'whitespace)
+    (setq whitespace-style '(face tabs empty trailing lines-tail))
+    (global-whitespace-mode +1))
+
   (progn ;; custom keybindings
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (global-set-key (kbd "M-p") 'package-install)
     (global-set-key (kbd "C-x t") 'neotree-toggle)
+    (global-set-key (kbd "C-x g") 'magit)
+    (global-set-key [f5] (lambda ()
+                           (interactive)
+                           (find-file (expand-file-name "~/.emacs.d/init.el"))))
     (global-set-key (kbd "M-N") 'display-line-numbers-mode))
 
   ;; extra modes
   (global-undo-tree-mode +1)
   (global-display-line-numbers-mode +1)
   (global-flycheck-mode +1)
+  (delete-selection-mode +1)
+  (global-whitespace-cleanup-mode +1)
 
   ;; sane defaults
   (fset 'yes-or-no-p 'y-or-n-p)
