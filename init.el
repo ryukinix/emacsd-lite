@@ -17,13 +17,11 @@
 
 
 (progn ;; set custom-file properly
-  (setq custom-file (expand-file-name "~/.emacs.d/custom.el"))
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file t))
 
 (progn ;; setup melpa
   (require 'package)
-  ;; accessing a package repo over https on Windows is a no go, so we
-  ;; fallback to http there
   (if (eq system-type 'windows-nt)
       (add-to-list 'package-archives
            '("melpa" . "http://melpa.org/packages/") t)
@@ -71,7 +69,8 @@
     (global-set-key (kbd "C-x g") 'magit)
     (global-set-key [f5] (lambda ()
                            (interactive)
-                           (find-file (expand-file-name "~/.emacs.d/init.el"))))
+                           (find-file (expand-file-name "init.el"
+                                                        user-emacs-directory))))
     (global-set-key (kbd "M-N") 'display-line-numbers-mode))
 
   ;; extra modes
