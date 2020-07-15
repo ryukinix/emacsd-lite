@@ -46,7 +46,8 @@
   (progn ;; smartparens
     (require 'smartparens-config)
     (with-eval-after-load 'smartparens
-      (setq sp-base-key-bindings 'paredit)
+      ;; if you use Ctrl+(Left|Right), disable the next line
+      (sp-use-paredit-bindings) ;; paredit keybindings
       (smartparens-global-mode +1)
       (smartparens-strict-mode +1)
       (show-smartparens-global-mode +1)))
