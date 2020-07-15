@@ -1,0 +1,6 @@
+elpa/
+transient/
+auto-save-list/
+*~
+*#
+*.elc
