@@ -1,5 +1,7 @@
-;;;; init.el -- Summary: minimal emacs config for basic editting
-;;; Commentary: Emacs lite config, sane defaults and fast startup
+;;; init.el --- Summary: minimal emacs config for basic editting
+;;; Commentary:
+;;; Emacs lite config, sane defaults and fast startup
+;;; It should be easy to setup and use.
 ;;; Code:
 
 (defvar emacs-packages
@@ -9,14 +11,14 @@
     company                  ;; autocompletion system
     company-quickhelp        ;; autocomplete docs pop-up
     neotree                  ;; neotree C-x t (file tree on side)
-	magit                    ;; ultra magic git interface
-	whitespace-cleanup-mode  ;; killing trailing whitespaces
+    magit                    ;; ultra magic git interface
+    whitespace-cleanup-mode  ;; killing trailing whitespaces
     ))
 
 
 (progn ;; set custom-file properly
-  (setq custom-file "~/.emacs.d/custom.el")
-  (load custom-file))
+  (setq custom-file (expand-file-name "~/.emacs.d/custom.el"))
+  (load custom-file t))
 
 (progn ;; setup melpa
   (require 'package)
@@ -24,26 +26,31 @@
   ;; fallback to http there
   (if (eq system-type 'windows-nt)
       (add-to-list 'package-archives
-		   '("melpa" . "http://melpa.org/packages/") t)
+           '("melpa" . "http://melpa.org/packages/") t)
     (add-to-list 'package-archives
-		 '("melpa" . "https://melpa.org/packages/") t))
+         '("melpa" . "https://melpa.org/packages/") t))
 
-  (package-initialize)
-  (package-refresh-contents))
+  (package-initialize))
 
-(progn ;; install packages
+(progn ;; install not installed packages
   (require 'seq)
-  (mapc #'package-install
-	  (seq-filter (lambda (p)
-			(not (package-installed-p p)))
-		      emacs-packages)))
+  (let ((not-installed-packages (seq-filter (lambda (p)
+                                              (not (package-installed-p p)))
+                                            emacs-packages)))
+    (when not-installed-packages
+      (package-refresh-contents)
+      (mapc #'package-install not-installed-packages))))
+
 
 (progn ;; confs
   (progn ;; smartparens
     (require 'smartparens-config)
-    (smartparens-global-mode +1)
-    (smartparens-strict-mode +1)
-    (show-smartparens-mode +1))
+    (with-eval-after-load 'smartparens
+      (setq sp-base-key-bindings 'paredit)
+      (smartparens-global-mode +1)
+      (smartparens-strict-mode +1)
+      (show-smartparens-global-mode +1)))
+
   (progn ;; company
     (require 'company)
     (global-company-mode +1)
@@ -64,16 +71,20 @@
   (global-undo-tree-mode +1)
   (global-display-line-numbers-mode +1)
   (global-flycheck-mode +1)
-  
+
   ;; sane defaults
   (fset 'yes-or-no-p 'y-or-n-p)
   (setq confirm-nonexistent-file-or-buffer nil)
+  (setq x-select-enable-clipboard-manager nil)
   (setq-default tab-width 4)
-  (setq inhibit-startup-screen t)  ;; annoying startup screen
-  (setq auto-save-default nil)     ;; annoying files.txt~
-  (setq make-backup-files nil)     ;; annoying #files.txt#
-  (menu-bar-mode -1)               ;; annoying menu-bar
-  (tool-bar-mode -1)               ;; annoying tool-bar
+  (setq-default indent-tabs-mode nil) ;; no tabs! whitespace rules
+  (setq inhibit-startup-screen t)     ;; annoying startup screen
+  (setq auto-save-default nil)        ;; annoying files.txt~
+  (setq make-backup-files nil)        ;; annoying #files.txt#
+  (menu-bar-mode -1)                  ;; annoying menu-bar
+  (tool-bar-mode -1)                  ;; annoying tool-bar
+  (scroll-bar-mode -1)                ;; annoying scroll-bar
+  (load-theme 'wombat)                ;; nice default theme
   )
 
 (provide 'init)
