@@ -1,4 +1,4 @@
-;;; init.el --- Summary: minimal emacs config for basic editting
+;;; init.el --- Summary: minimal emacs config for basic editing
 ;;; Commentary:
 ;;; Emacs lite config, sane defaults and fast startup
 ;;; It should be easy to setup and use.
