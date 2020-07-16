@@ -45,7 +45,7 @@
     (require 'smartparens-config)
     (sp-use-paredit-bindings) ;; paredit keybindings
     (smartparens-global-mode +1)
-    (smartparens-strict-mode +1)
+    (smartparens-global-strict-mode +1)
     (show-smartparens-global-mode +1))
   (progn ;; company
     (require 'company)
