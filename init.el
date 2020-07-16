@@ -9,7 +9,6 @@
     undo-tree                ;; C-x u, super undo system
     flycheck                 ;; ultra linter package
     company                  ;; autocompletion system
-    company-quickhelp        ;; autocomplete docs pop-up
     neotree                  ;; neotree C-x t (file tree on side)
     magit                    ;; ultra magic git interface
     whitespace-cleanup-mode  ;; killing trailing whitespaces
