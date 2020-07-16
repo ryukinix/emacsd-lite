@@ -93,6 +93,7 @@
   (tool-bar-mode -1)                  ;; annoying tool-bar
   (scroll-bar-mode -1)                ;; annoying scroll-bar
   (load-theme 'wombat)                ;; nice default theme
+  (blink-cursor-mode -1)              ;; unecessary
   )
 
 (provide 'init)
