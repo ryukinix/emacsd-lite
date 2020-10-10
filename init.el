@@ -12,6 +12,7 @@
     neotree                  ;; neotree C-x t (file tree on side)
     magit                    ;; ultra magic git interface
     whitespace-cleanup-mode  ;; killing trailing whitespaces
+    crux                     ;; utils
     ))
 
 
@@ -66,6 +67,9 @@
     (global-set-key (kbd "M-p") 'package-install)
     (global-set-key (kbd "C-x t") 'neotree-toggle)
     (global-set-key (kbd "C-x g") 'magit)
+    (global-set-key (kbd "C-c d")
+                    'crux-duplicate-current-line-or-region)
+
     (global-set-key [f5] (lambda ()
                            (interactive)
                            (find-file (expand-file-name "init.el"
