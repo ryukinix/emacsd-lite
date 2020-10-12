@@ -78,6 +78,11 @@
     (global-set-key (kbd "C-c d")
                     'crux-duplicate-current-line-or-region)
 
+    ;; zoom in/out
+    (global-set-key (kbd "C-+") 'text-scale-increase)
+    (global-set-key (kbd "C-<pause>") 'text-scale-decrease)
+    (global-set-key (kbd "C--") 'text-scale-decrease)
+
     (global-set-key [f5] (lambda ()
                            (interactive)
                            (find-file (expand-file-name "init.el"
