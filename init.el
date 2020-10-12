@@ -62,6 +62,13 @@
     (setq whitespace-style '(face tabs empty trailing lines-tail))
     (global-whitespace-mode +1))
 
+  (progn ;; recentf
+    (require 'recentf)
+    (recentf-mode +1)
+    (setq recentf-max-menu-items 25)
+    (setq recentf-max-saved-items 25)
+    (global-set-key (kbd "C-c f") 'recentf-open-files))
+
   (progn ;; custom keybindings
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (global-set-key (kbd "M-p") 'package-install)
