@@ -13,6 +13,7 @@
     magit                    ;; ultra magic git interface
     whitespace-cleanup-mode  ;; killing trailing whitespaces
     crux                     ;; utils
+    modus-vivendi-theme      ;; nice dark theme
     ))
 
 
@@ -102,7 +103,7 @@
   (menu-bar-mode -1)                  ;; annoying menu-bar
   (tool-bar-mode -1)                  ;; annoying tool-bar
   (scroll-bar-mode -1)                ;; annoying scroll-bar
-  (load-theme 'wombat)                ;; nice default theme
+  (load-theme 'modus-vivendi)         ;; nice theme
   (blink-cursor-mode -1)              ;; unecessary
   )
 
