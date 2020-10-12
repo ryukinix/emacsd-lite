@@ -16,7 +16,6 @@
     modus-vivendi-theme      ;; nice dark theme
     ))
 
-
 (progn ;; set custom-file properly
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file t))
@@ -62,6 +61,10 @@
     (require 'whitespace)
     (setq whitespace-style '(face tabs empty trailing lines-tail))
     (global-whitespace-mode +1))
+
+  (progn ;; org-mode
+    (require 'org-mouse) ;; mouse support
+    )
 
   (progn ;; recentf
     (require 'recentf)
