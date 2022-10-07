@@ -24,6 +24,7 @@
     lsp-treemacs
     helm
     helm-projectile
+    helm-descbinds
     ))
 
 
@@ -92,16 +93,25 @@
     )
 
   (progn ;;helm
-    (require 'helm)
-    (require 'helm-config)
-    (global-set-key (kbd "C-x C-f") #'helm-find-files)
-    (global-set-key (kbd "M-x") #'helm-M-x)
-    (global-set-key (kbd "M-y") #'helm-show-kill-ring)
-    (require 'helm-projectile)
-    (helm-projectile-on)
+    (define-key isearch-mode-map (kbd "C-o") 'helm-occur-from-isearch)
+    (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
+    (global-set-key (kbd "C-c f") 'helm-recentf)
+    (global-set-key (kbd "C-h C-l") 'helm-locate-library)
+    (global-set-key (kbd "C-h f") 'helm-apropos)
+    (global-set-key (kbd "C-h r") 'helm-info-emacs)
+    (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+    (global-set-key (kbd "C-x C-f") 'helm-find-files)
+    (global-set-key (kbd "C-x C-m") 'helm-M-x)
+    (global-set-key (kbd "C-x b") 'helm-mini)
+    (global-set-key (kbd "C-x C-d") #'helm-browse-project)
     (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-    (global-set-key (kbd "C-x r b") #'helm-browse-projects)
-    )
+    (global-set-key (kbd "M-x") 'helm-M-x)
+    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+    (helm-descbinds-mode +1)
+    (helm-mode +1)
+    ;; enable Helm version of Projectile with replacment commands
+    (helm-projectile-on)
+)
 
   (progn ;; recentf
     (require 'recentf)
@@ -113,8 +123,9 @@
   (progn ;; custom keybindings
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (global-set-key (kbd "M-p") 'package-install)
-    (global-set-key (kbd "C-x t") 'neotree-toggle)
+    (global-set-key (kbd "C-x t") 'treemacs)
     (global-set-key (kbd "C-x g") 'magit)
+    (global-set-key (kbd "C-c t") 'ansi-term)
     (global-set-key (kbd "C-c d")
                     'crux-duplicate-current-line-or-region)
 
@@ -167,6 +178,9 @@
   ;; use shift + arrow keys to switch between visible buffers
   (require 'windmove)
   (windmove-default-keybindings)
+
+  (require 'magit)
+  ;; make git-commit available
   )
 
 (provide 'init)
