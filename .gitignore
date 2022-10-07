@@ -9,3 +9,5 @@ recentf
 /projectile-bookmarks.eld
 /.lsp-session-v1
 .cache
+/.dap-breakpoints
+/projectile.cache
