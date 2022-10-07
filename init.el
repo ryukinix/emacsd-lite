@@ -16,6 +16,7 @@
     magit                    ;; ultra magic git interface
     whitespace-cleanup-mode  ;; killing trailing whitespaces
     crux                     ;; utils
+    move-text                ;; move-up down text
     ;;    modus-vivendi-theme      ;; nice dark theme
     kaolin-themes
     lsp-mode
@@ -31,32 +32,49 @@
     ))
 
 
+(defun lite-boot ()
+  "Basic initial config."
 
-(progn ;; set custom-file properly
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (load custom-file t))
+  (progn ;; set custom-file properly
+    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+    (load custom-file t))
 
-(progn ;; setup lsp
-  (require 'package)
-  (if (eq system-type 'windows-nt)
+  (progn ;; setup lsp
+    (require 'package)
+    (if (eq system-type 'windows-nt)
+        (add-to-list 'package-archives
+                     '("melpa" . "http://melpa.org/packages/") t)
       (add-to-list 'package-archives
-           '("melpa" . "http://melpa.org/packages/") t)
-    (add-to-list 'package-archives
-         '("melpa" . "https://melpa.org/packages/") t))
+                   '("melpa" . "https://melpa.org/packages/") t))
 
-  (package-initialize))
+    (package-initialize))
 
-(progn ;; install not installed packages
-  (setq package-selected-packages (append emacs-packages package-selected-packages))
-  (let ((not-installed-packages (seq-filter (lambda (p)
-                                              (not (package-installed-p p)))
-                                            emacs-packages)))
-    (when not-installed-packages
-      (package-refresh-contents)
-      (mapc #'package-install not-installed-packages))))
+  (progn ;; install not installed packages
+    (setq package-selected-packages (append emacs-packages package-selected-packages))
+    (let ((not-installed-packages (seq-filter (lambda (p)
+                                                (not (package-installed-p p)))
+                                              emacs-packages)))
+      (when not-installed-packages
+        (package-refresh-contents)
+        (mapc #'package-install not-installed-packages))))
+
+  )
 
 
-(progn ;; confs
+(defun lite-load-init-env-if-exists ()
+  "Used to load  emacs.d/.env if exists."
+  (require 'load-env-vars)
+  (let ((env-file-path (expand-file-name ".env" user-emacs-directory)))
+    (if (file-exists-p env-file-path)
+        (progn
+          (message "Loading %s env file..." env-file-path)
+          (load-env-vars env-file-path)))))
+
+
+
+
+(defun lite-configuration () ;; confs
+  "Modes, keybindings and config."
   (progn ;; smartparens
     ;; smart pairing for all
     (require 'smartparens)
@@ -66,10 +84,10 @@
     (setq sp-hybrid-kill-entire-symbol nil)
     (sp-use-paredit-bindings)
     (show-smartparens-global-mode +1)
-    (smartparens-global-mode +1)
+    (show-smartparens-mode +1)
+    (smartparens-global-strict-mode +1)
     ;; avoid edit weirdness at M-: eval expression
-    (add-hook 'minibuffer-setup-hook 'turn-on-smartparens-strict-mode)
-    )
+    (add-hook 'minibuffer-setup-hook 'turn-on-smartparens-strict-mode))
 
   (progn ;; company
     (require 'company)
@@ -81,21 +99,21 @@
     (define-key company-active-map (kbd "\C-p") 'company-select-previous)
     (define-key company-active-map (kbd "\C-d") 'company-show-doc-buffer)
     (define-key company-active-map (kbd "M-.") 'company-show-location))
+
   (progn ;; whitespace
     (require 'whitespace)
     (setq whitespace-style '(face tabs empty trailing lines-tail))
     (global-whitespace-mode +1))
 
-
   (progn ;; org-mode
-    (require 'org-mouse) ;; mouse support
-    )
+    ;; mouse support
+    (require 'org-mouse))
+
   (progn ;;projectile
     (require 'projectile)
     (define-key projectile-mode-map (kbd "C-c p") projectile-command-map)
     (global-set-key (kbd "<f9>") 'projectile-compile-project)
-    (projectile-mode +1)
-    )
+    (projectile-mode +1))
 
   (progn ;;helm
     (define-key isearch-mode-map (kbd "C-o") 'helm-occur-from-isearch)
@@ -115,15 +133,24 @@
     (helm-descbinds-mode +1)
     (helm-mode +1)
     ;; enable Helm version of Projectile with replacment commands
-    (helm-projectile-on)
-)
+    (helm-projectile-on))
+
+  (progn ;; move text around
+    (require 'move-text)
+    (global-set-key (kbd "M-S-<up>") 'move-text-up)
+    (global-set-key (kbd "M-S-<down>") 'move-text-down)
+    )
 
   (progn ;; custom keybindings
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (global-set-key (kbd "M-p") 'package-install)
     (global-set-key (kbd "C-x t") 'treemacs)
     (global-set-key (kbd "C-x g") 'magit)
-    (global-set-key (kbd "C-c t") 'ansi-term)
+    (global-set-key (kbd "C-c t")
+                    (lambda ()
+                      (interactive)
+                      (ansi-term "/usr/bin/zsh")))
+
     (global-set-key (kbd "C-c d")
                     'crux-duplicate-current-line-or-region)
 
@@ -139,19 +166,20 @@
     (global-set-key (kbd "M-N") 'display-line-numbers-mode)
     ;; split keybindings
     ;;    (global-set-key (kbd "C-x /") 'lerax-toggle-window-split)
+    ;; too long definition, need to prepare a modular system
     (global-set-key (kbd "C-x |") 'split-window-horizontally)
     (global-set-key (kbd "C-x _") 'split-window-vertically)
 
-    (global-set-key (kbd "C-M-S-k") 'kill-this-buffer-and-window)
     (defun kill-this-buffer-and-window ()
       (interactive)
       (if (> (length (window-list)) 1)
           (kill-buffer-and-window)
         (kill-buffer (current-buffer))))
-    (global-set-key (kbd "C-<backspace>") 'crux-kill-line-backwards)
-    )
 
-  ;; lsp
+    (global-set-key (kbd "C-M-S-k") 'kill-this-buffer-and-window)
+    (global-set-key (kbd "C-<backspace>") 'crux-kill-line-backwards))
+
+  ;; python - lsp
   (progn
     (require 'pyvenv)
     (defun lerax-python-venv-auto-activate ()
@@ -159,61 +187,67 @@
       (let* ((basepath (or (projectile-project-root) default-directory))
              (venvpath (concat basepath ".venv/")))
         (when (and (not (string-equal venvpath pyvenv-virtual-env))
-               (file-exists-p venvpath))
+                   (file-exists-p venvpath))
           (pyvenv-activate venvpath))))
 
     (require 'lsp-mode)
     (setq lsp-keymap-prefix "C-.")
     (require 'lsp-pylsp)
     (add-hook 'python-mode-hook
-              (lambda ()
-                (interactive)
-                (lerax-python-venv-auto-activate)
-                (lsp-mode +1)
-                (lsp)
-                )
-              ))
+               (lambda ()
+                 (interactive)
+                 (lerax-python-venv-auto-activate)
+                 (lsp-mode +1)
+                 (lsp))))
 
-  ;; extra modes
-  (global-undo-tree-mode +1)
-  (global-display-line-numbers-mode +1)
-  (global-flycheck-mode +1)
-  (delete-selection-mode +1)
-  (global-whitespace-cleanup-mode +1)
+  (progn ;; global undo tree
+    ;; supercharge your undo/redo with undo-tree
+    (require 'undo-tree)
+    ;; autosave the undo-tree history
+    (setq undo-tree-history-directory-alist
+          `((".*" . ,temporary-file-directory)))
+    (setq undo-tree-auto-save-history t)
+    (global-undo-tree-mode)
 
-  ;; sane defaults
-  (fset 'yes-or-no-p 'y-or-n-p)
-  (setq confirm-nonexistent-file-or-buffer nil)
-  (setq x-select-enable-clipboard-manager nil)
-  (setq tab-always-indent 'complete) ;; smart tab behavior - indent or complete
-  (setq-default tab-width 4)
-  (setq-default indent-tabs-mode nil) ;; no tabs! whitespace rules
-  (setq inhibit-startup-screen t)     ;; annoying startup screen
-  (setq auto-save-default nil)        ;; annoying files.txt~
-  (setq make-backup-files nil)        ;; annoying #files.txt#
-  (menu-bar-mode -1)                  ;; annoying menu-bar
-  (tool-bar-mode -1)                  ;; annoying tool-bar
-  (scroll-bar-mode -1)                ;; annoying scroll-bar
-  (load-theme 'kaolin-ocean t)         ;; nice theme
-  (blink-cursor-mode -1)              ;; unecessary
+    )
 
-  ;; use shift + arrow keys to switch between visible buffers
-  (require 'windmove)
-  (windmove-default-keybindings)
+  (progn ;; sane modes and defaults
+    (global-display-line-numbers-mode +1)
+    (global-flycheck-mode +1)
+    (delete-selection-mode +1)
+    (global-whitespace-cleanup-mode +1)
 
-  (require 'magit)
-  ;; make git-commit available
-  (simple-modeline-mode +1)
-  )
+    ;; sane defaults
+    (fset 'yes-or-no-p 'y-or-n-p)
+    (setq confirm-nonexistent-file-or-buffer nil)
+    (setq x-select-enable-clipboard-manager nil)
+    (setq tab-always-indent 'complete) ;; smart tab behavior - indent or complete
+    (setq-default tab-width 4)
+    (setq-default indent-tabs-mode nil) ;; no tabs! whitespace rules
+    (setq inhibit-startup-screen t)     ;; annoying startup screen
+    (setq auto-save-default nil)        ;; annoying files.txt~
+    (setq make-backup-files nil)        ;; annoying #files.txt#
+    (menu-bar-mode -1)                  ;; annoying menu-bar
+    (tool-bar-mode -1)                  ;; annoying tool-bar
+    (scroll-bar-mode -1)                ;; annoying scroll-bar
+    (load-theme 'kaolin-ocean t)         ;; nice theme
+    (blink-cursor-mode -1)              ;; unecessary
 
-(defun load-init-env-if-exists ()
-  (require 'load-env-vars)
-  (let ((env-file-path (expand-file-name ".env" user-emacs-directory)))
-    (if (file-exists-p env-file-path)
-        (progn
-          (message "Loading %s env file..." env-file-path)
-          (load-env-vars env-file-path)))))
+    ;; use shift + arrow keys to switch between visible buffers
+    (require 'windmove)
+    (windmove-default-keybindings '(control shift))
 
-(load-init-env-if-exists)
-(provide 'init)
+    (require 'magit)
+    ;; make git-commit available
+    (simple-modeline-mode +1)
+
+    )
+
+)
+
+(lite-boot)
+(lite-load-init-env-if-exists)
+(lite-configuration)
+
+(provide 'lite)
 ;;; init.el ends here
