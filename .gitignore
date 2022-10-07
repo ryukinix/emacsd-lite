@@ -5,3 +5,6 @@ auto-save-list/
 *#
 *.elc
 recentf
+/custom.el
+/projectile-bookmarks.eld
+/.lsp-session-v1

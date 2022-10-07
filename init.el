@@ -9,18 +9,30 @@
     undo-tree                ;; C-x u, super undo system
     flycheck                 ;; ultra linter package
     company                  ;; autocompletion system
-    neotree                  ;; neotree C-x t (file tree on side)
+    ;; neotree                  ;; neotree C-x t (file tree on side)
+    treemacs
+    treemacs-projectile
+    projectile
     magit                    ;; ultra magic git interface
     whitespace-cleanup-mode  ;; killing trailing whitespaces
     crux                     ;; utils
-    modus-vivendi-theme      ;; nice dark theme
+    ;;    modus-vivendi-theme      ;; nice dark theme
+    kaolin-themes
+    lsp-mode
+    lsp-ui
+    dap-mode
+    lsp-treemacs
+    helm
+    helm-projectile
     ))
+
+
 
 (progn ;; set custom-file properly
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file t))
 
-(progn ;; setup melpa
+(progn ;; setup lsp
   (require 'package)
   (if (eq system-type 'windows-nt)
       (add-to-list 'package-archives
@@ -31,7 +43,7 @@
   (package-initialize))
 
 (progn ;; install not installed packages
-  (require 'seq)
+  (setq package-selected-packages (append emacs-packages package-selected-packages))
   (let ((not-installed-packages (seq-filter (lambda (p)
                                               (not (package-installed-p p)))
                                             emacs-packages)))
@@ -42,11 +54,18 @@
 
 (progn ;; confs
   (progn ;; smartparens
+    ;; smart pairing for all
     (require 'smartparens-config)
-    (sp-use-paredit-bindings) ;; paredit keybindings
+    (setq sp-base-key-bindings 'paredit)
+    (setq sp-autoskip-closing-pair 'always)
+    (setq sp-hybrid-kill-entire-symbol nil)
+    (sp-use-paredit-bindings)
+    (show-smartparens-global-mode +1)
     (smartparens-global-mode +1)
-    (smartparens-global-strict-mode +1)
-    (show-smartparens-global-mode +1))
+    ;; avoid edit weirdness at M-: eval expression
+    (add-hook 'minibuffer-setup-hook 'turn-on-smartparens-strict-mode)
+    )
+
   (progn ;; company
     (require 'company)
     (global-company-mode +1)
@@ -62,8 +81,26 @@
     (setq whitespace-style '(face tabs empty trailing lines-tail))
     (global-whitespace-mode +1))
 
+
   (progn ;; org-mode
     (require 'org-mouse) ;; mouse support
+    )
+  (progn ;;projectile
+    (require 'projectile)
+    (define-key projectile-mode-map (kbd "C-c p") projectile-command-map)
+    (projectile-mode +1)
+    )
+
+  (progn ;;helm
+    (require 'helm)
+    (require 'helm-config)
+    (global-set-key (kbd "C-x C-f") #'helm-find-files)
+    (global-set-key (kbd "M-x") #'helm-M-x)
+    (global-set-key (kbd "M-y") #'helm-show-kill-ring)
+    (require 'helm-projectile)
+    (helm-projectile-on)
+    (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+    (global-set-key (kbd "C-x r b") #'helm-browse-projects)
     )
 
   (progn ;; recentf
@@ -86,11 +123,23 @@
     (global-set-key (kbd "C-<pause>") 'text-scale-decrease)
     (global-set-key (kbd "C--") 'text-scale-decrease)
 
-    (global-set-key [f5] (lambda ()
+    (global-set-key [f8] (lambda ()
                            (interactive)
                            (find-file (expand-file-name "init.el"
                                                         user-emacs-directory))))
     (global-set-key (kbd "M-N") 'display-line-numbers-mode))
+
+  ;; lsp
+  (progn
+    (require 'lsp-mode)
+    (setq lsp-keymap-prefix "C-.")
+    (add-hook 'python-mode-hook
+              (lambda ()
+                (require 'lsp-pylsp)
+                (lsp-mode +1)
+                (lsp)
+                )
+              ))
 
   ;; extra modes
   (global-undo-tree-mode +1)
@@ -103,6 +152,7 @@
   (fset 'yes-or-no-p 'y-or-n-p)
   (setq confirm-nonexistent-file-or-buffer nil)
   (setq x-select-enable-clipboard-manager nil)
+  (setq tab-always-indent 'complete) ;; smart tab behavior - indent or complete
   (setq-default tab-width 4)
   (setq-default indent-tabs-mode nil) ;; no tabs! whitespace rules
   (setq inhibit-startup-screen t)     ;; annoying startup screen
@@ -111,8 +161,12 @@
   (menu-bar-mode -1)                  ;; annoying menu-bar
   (tool-bar-mode -1)                  ;; annoying tool-bar
   (scroll-bar-mode -1)                ;; annoying scroll-bar
-  (load-theme 'modus-vivendi)         ;; nice theme
+  (load-theme 'kaolin-ocean)         ;; nice theme
   (blink-cursor-mode -1)              ;; unecessary
+
+  ;; use shift + arrow keys to switch between visible buffers
+  (require 'windmove)
+  (windmove-default-keybindings)
   )
 
 (provide 'init)
