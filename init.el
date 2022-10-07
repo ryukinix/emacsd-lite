@@ -59,6 +59,7 @@
 (progn ;; confs
   (progn ;; smartparens
     ;; smart pairing for all
+    (require 'smartparens)
     (require 'smartparens-config)
     (setq sp-base-key-bindings 'paredit)
     (setq sp-autoskip-closing-pair 'always)
@@ -193,7 +194,7 @@
   (menu-bar-mode -1)                  ;; annoying menu-bar
   (tool-bar-mode -1)                  ;; annoying tool-bar
   (scroll-bar-mode -1)                ;; annoying scroll-bar
-  (load-theme 'kaolin-ocean)         ;; nice theme
+  (load-theme 'kaolin-ocean t)         ;; nice theme
   (blink-cursor-mode -1)              ;; unecessary
 
   ;; use shift + arrow keys to switch between visible buffers
