@@ -25,6 +25,9 @@
     helm
     helm-projectile
     helm-descbinds
+    pyvenv
+    simple-modeline
+    load-env-vars
     ))
 
 
@@ -89,6 +92,7 @@
   (progn ;;projectile
     (require 'projectile)
     (define-key projectile-mode-map (kbd "C-c p") projectile-command-map)
+    (global-set-key (kbd "<f9>") 'projectile-compile-project)
     (projectile-mode +1)
     )
 
@@ -113,13 +117,6 @@
     (helm-projectile-on)
 )
 
-  (progn ;; recentf
-    (require 'recentf)
-    (recentf-mode +1)
-    (setq recentf-max-menu-items 25)
-    (setq recentf-max-saved-items 25)
-    (global-set-key (kbd "C-c f") 'recentf-open-files))
-
   (progn ;; custom keybindings
     (global-set-key (kbd "C-x C-b") 'ibuffer)
     (global-set-key (kbd "M-p") 'package-install)
@@ -138,15 +135,39 @@
                            (interactive)
                            (find-file (expand-file-name "init.el"
                                                         user-emacs-directory))))
-    (global-set-key (kbd "M-N") 'display-line-numbers-mode))
+    (global-set-key (kbd "M-N") 'display-line-numbers-mode)
+    ;; split keybindings
+    ;;    (global-set-key (kbd "C-x /") 'lerax-toggle-window-split)
+    (global-set-key (kbd "C-x |") 'split-window-horizontally)
+    (global-set-key (kbd "C-x _") 'split-window-vertically)
+
+    (global-set-key (kbd "C-M-S-k") 'kill-this-buffer-and-window)
+    (defun kill-this-buffer-and-window ()
+      (interactive)
+      (if (> (length (window-list)) 1)
+          (kill-buffer-and-window)
+        (kill-buffer (current-buffer))))
+    (global-set-key (kbd "C-<backspace>") 'crux-kill-line-backwards)
+    )
 
   ;; lsp
   (progn
+    (require 'pyvenv)
+    (defun lerax-python-venv-auto-activate ()
+      (interactive)
+      (let* ((basepath (or (projectile-project-root) default-directory))
+             (venvpath (concat basepath ".venv/")))
+        (when (and (not (string-equal venvpath pyvenv-virtual-env))
+               (file-exists-p venvpath))
+          (pyvenv-activate venvpath))))
+
     (require 'lsp-mode)
     (setq lsp-keymap-prefix "C-.")
+    (require 'lsp-pylsp)
     (add-hook 'python-mode-hook
               (lambda ()
-                (require 'lsp-pylsp)
+                (interactive)
+                (lerax-python-venv-auto-activate)
                 (lsp-mode +1)
                 (lsp)
                 )
@@ -181,7 +202,17 @@
 
   (require 'magit)
   ;; make git-commit available
+  (simple-modeline-mode +1)
   )
 
+(defun load-init-env-if-exists ()
+  (require 'load-env-vars)
+  (let ((env-file-path (expand-file-name ".env" user-emacs-directory)))
+    (if (file-exists-p env-file-path)
+        (progn
+          (message "Loading %s env file..." env-file-path)
+          (load-env-vars env-file-path)))))
+
+(load-init-env-if-exists)
 (provide 'init)
 ;;; init.el ends here
