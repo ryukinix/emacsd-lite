@@ -240,10 +240,12 @@
     (require 'magit)
     ;; make git-commit available
     (simple-modeline-mode +1)
-
+    (setq-default
+     frame-title-format (concat (getenv "USER") "@emacs %b")
+     )
     )
 
-)
+  )
 
 (lite-boot)
 (lite-load-init-env-if-exists)
