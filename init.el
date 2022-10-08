@@ -39,7 +39,10 @@
     (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
     (load custom-file t))
 
-  (progn ;; setup lsp
+  (progn
+    ;; bug workaround
+    (when (version<= emacs-version "26.2")
+      (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
     (require 'package)
     (if (eq system-type 'windows-nt)
         (add-to-list 'package-archives
@@ -229,7 +232,8 @@
     (setq make-backup-files nil)        ;; annoying #files.txt#
     (menu-bar-mode -1)                  ;; annoying menu-bar
     (tool-bar-mode -1)                  ;; annoying tool-bar
-    (scroll-bar-mode -1)                ;; annoying scroll-bar
+    (when (display-graphic-p)
+      (scroll-bar-mode -1))                ;; annoying scroll-bar
     (load-theme 'kaolin-ocean t)         ;; nice theme
     (blink-cursor-mode -1)              ;; unecessary
 
@@ -244,7 +248,6 @@
      frame-title-format (concat (getenv "USER") "@emacs %b")
      )
     )
-
   )
 
 (lite-boot)
