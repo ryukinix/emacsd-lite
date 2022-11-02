@@ -209,6 +209,8 @@
     ;; autosave the undo-tree history
     (setq undo-tree-history-directory-alist
           `((".*" . ,temporary-file-directory)))
+    (setq backup-directory-alist
+          `((".*" . ,temporary-file-directory)))
     (setq undo-tree-auto-save-history t)
     (global-undo-tree-mode)
 
@@ -232,8 +234,9 @@
     (setq make-backup-files nil)        ;; annoying #files.txt#
     (menu-bar-mode -1)                  ;; annoying menu-bar
     (tool-bar-mode -1)                  ;; annoying tool-bar
-    (when (display-graphic-p)
-      (scroll-bar-mode -1))                ;; annoying scroll-bar
+    (when (fboundp 'scroll-bar-mode)    ;; disable that ugly scroll bar, i don't need that
+      (scroll-bar-mode -1))
+
     (load-theme 'kaolin-ocean t)         ;; nice theme
     (blink-cursor-mode -1)              ;; unecessary
 
