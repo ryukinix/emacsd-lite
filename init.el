@@ -58,7 +58,8 @@
                                                 (not (package-installed-p p)))
                                               emacs-packages)))
       (when not-installed-packages
-        (package-refresh-contents)
+        (when (not package-archive-contents)
+          (package-refresh-contents))
         (mapc #'package-install not-installed-packages))))
 
   )
